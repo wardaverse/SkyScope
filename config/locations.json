@@ -1,0 +1,7 @@
+{
+  "locations": [
+    { "city": "Karachi", "country": "PK" },
+    { "city": "London", "country": "GB" },
+    { "city": "Salt Lake City", "country": "US" }
+  ]
+}
