@@ -1,0 +1,7 @@
+pymongo
+requests
+python-dotenv
+folium
+matplotlib
+geopy
+Pillow
