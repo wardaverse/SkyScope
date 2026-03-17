@@ -1,32 +1,36 @@
 import os
-import requests
-from datetime import datetime
-from src.config_loader import load_env
+import folium
 from src.db import get_collections
 
-MAP_LAYER = "TA2"  # example temperature layer
-
-def download_weather_map(z=2, x=2, y=1):
-    env = load_env()
-    url = f"https://maps.openweathermap.org/maps/2.0/weather/{MAP_LAYER}/{z}/{x}/{y}"
-    params = {
-        "appid": env["openweather_api_key"]
-    }
-
-    response = requests.get(url, params=params, timeout=30)
-    response.raise_for_status()
-
+def build_city_map(output_file="data/maps/city_weather_map.html"):
     os.makedirs("data/maps", exist_ok=True)
-    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-    file_path = f"data/maps/{MAP_LAYER}_{timestamp}.png"
+    docs = list(get_collections()["forecasts"].find())
 
-    with open(file_path, "wb") as f:
-        f.write(response.content)
+    if not docs:
+        print("No forecast data available for map")
+        return None
 
-    get_collections()["maps"].insert_one({
-        "layer": MAP_LAYER,
-        "file_path": file_path,
-        "downloaded_at": datetime.utcnow()
-    })
+    weather_map = folium.Map(location=[20, 0], zoom_start=2)
 
-    return file_path
+    latest_by_city = {}
+    for doc in docs:
+        key = doc["city"]
+        if key not in latest_by_city or doc["forecast_time"] > latest_by_city[key]["forecast_time"]:
+            latest_by_city[key] = doc
+
+    for city, doc in latest_by_city.items():
+        popup = (
+            f"{city}<br>"
+            f"Temp: {doc['temperature_c']}°C<br>"
+            f"Precipitation: {doc['precipitation']} mm<br>"
+            f"Forecast: {doc['forecast_time']}"
+        )
+
+        folium.Marker(
+            location=[doc["lat"], doc["lon"]],
+            popup=popup,
+            tooltip=city
+        ).add_to(weather_map)
+
+    weather_map.save(output_file)
+    return output_file

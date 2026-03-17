@@ -5,3 +5,9 @@ folium
 matplotlib
 geopy
 Pillow
+
+pymongo
+requests
+python-dotenv
+folium
+matplotlib

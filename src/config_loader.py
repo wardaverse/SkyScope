@@ -6,7 +6,6 @@ load_dotenv()
 
 def load_env():
     return {
-        "openweather_api_key": os.getenv("OPENWEATHER_API_KEY"),
         "mongodb_uri": os.getenv("MONGODB_URI"),
         "mongodb_db": os.getenv("MONGODB_DB", "weather_monitor"),
     }

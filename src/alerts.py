@@ -1,36 +1,42 @@
 from datetime import datetime
 from src.db import get_collections
 
-FREEZING_F = 2
+RAIN_CODES = [51, 53, 55, 61, 63, 65, 80, 81, 82]
+SNOW_CODES = [71, 73, 75, 77, 85, 86]
 
-def generate_alerts(city, country, forecast_json):
+def generate_alerts(city, forecast_json):
     collections = get_collections()
+    hourly = forecast_json.get("hourly", {})
+
+    times = hourly.get("time", [])
+    temps = hourly.get("temperature_2m", [])
+    weather_codes = hourly.get("weather_code", [])
+
     alerts = []
 
-    for item in forecast_json.get("list", []):
-        weather_main = item["weather"][0]["main"].lower()
-        temp_f = item["main"]["temp"]
-        forecast_time = item.get("dt_txt")
-
+    for i in range(len(times)):
         reasons = []
-        if "rain" in weather_main:
+
+        if weather_codes[i] in RAIN_CODES:
             reasons.append("Rain expected")
-        if "snow" in weather_main:
+
+        if weather_codes[i] in SNOW_CODES:
             reasons.append("Snow expected")
-        if temp_f < FREEZING_F:
-            reasons.append(f"Freezing temperature expected: {temp_f}F")
+
+        if temps[i] < 0:
+            reasons.append(f"Freezing temperature expected: {temps[i]}°C")
 
         if reasons:
             alert = {
                 "city": city,
-                "country": country,
-                "forecast_time": forecast_time,
-                "temperature_f": temp_f,
+                "forecast_time": times[i],
+                "temperature_c": temps[i],
+                "weather_code": weather_codes[i],
                 "reasons": reasons,
                 "created_at": datetime.utcnow()
             }
             alerts.append(alert)
-            print(f"[ALERT] {city}, {country} @ {forecast_time} -> {', '.join(reasons)}")
+            print(f"[ALERT] {city} @ {times[i]} -> {', '.join(reasons)}")
 
     if alerts:
         collections["alerts"].insert_many(alerts)
