@@ -10,6 +10,5 @@ def get_collections():
     db = get_database()
     return {
         "forecasts": db["forecasts"],
-        "maps": db["maps_metadata"],
         "alerts": db["alerts"]
     }

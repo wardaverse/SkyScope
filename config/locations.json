@@ -1,7 +1,7 @@
 {
   "locations": [
-    { "city": "Karachi", "country": "PK" },
-    { "city": "London", "country": "GB" },
-    { "city": "Salt Lake City", "country": "US" }
+    { "city": "Karachi", "lat": 24.8607, "lon": 67.0011 },
+    { "city": "London", "lat": 51.5072, "lon": -0.1276 },
+    { "city": "Berlin", "lat": 52.52, "lon": 13.41 }
   ]
 }
