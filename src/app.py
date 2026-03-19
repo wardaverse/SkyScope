@@ -16,6 +16,7 @@ def run_once(locations):
         lat = location["lat"]
         lon = location["lon"]
 
+
         forecast = fetch_forecast(lat, lon)
         save_forecast(city, lat, lon, forecast)
         generate_alerts(city, forecast)
