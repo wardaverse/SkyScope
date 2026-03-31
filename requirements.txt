@@ -5,6 +5,8 @@ folium
 matplotlib
 geopy
 Pillow
+streamlit
+pandas
 
 pymongo
 requests
